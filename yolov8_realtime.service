@@ -1,0 +1,19 @@
+[Unit]
+Description=YOLOv8 Realtime Object Detection Service
+After=network.target
+
+[Service]
+Type=simple
+User=roboreactor
+WorkingDirectory=/home/roboreactor
+# Point directly to the virtual environment's Python interpreter
+ExecStart=/home/roboreactor/yolo_env/bin/python3 /home/roboreactor/yolov8_realtime.py
+Restart=always
+RestartSec=5
+# Optional: Redirect standard output and errors to system logs
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=yolov8_realtime
+
+[Install]
+WantedBy=multi-user.target
