@@ -56,8 +56,13 @@ def download_nodecode(request: GenerateRequest):
 
 @app.post("/post_nodecode")
 def generate_code(request: GenerateRequest):
-      # Check if the connection list of the output is blank or not blank
-      # This checks all nodes in reqdat for their outputs
+
+
+    email = request.email
+    project_name = request.project_name
+
+    # Always fetch reqdat at the start so it is defined for all usages
+    reqdat = requests.post("http://192.168.50.247:8774/get_node_code",json={"email":email,"project_name":project_name}).json()['drawflow']['Home']['data']
 
     # Check if the connection list of the output is blank or not blank
     for node_id, node_data in reqdat.items():
@@ -68,8 +73,6 @@ def generate_code(request: GenerateRequest):
                 print(f"Node {node_id} output '{output_name}' has a blank connection list.")
             else:
                 print(f"Node {node_id} output '{output_name}' has connections: {connections}")
-    email = request.email
-    project_name = request.project_name
 
     update_status(email, project_name, "Started generating node components...")
 
@@ -84,8 +87,6 @@ def generate_code(request: GenerateRequest):
             except Exception as e:
                 print(f"Failed to clean up {dir_path}: {e}")
 
-    reqdat = requests.post("http://192.168.50.247:8774/get_node_code",json={"email":email,"project_name":project_name}).json()['drawflow']['Home']['data'] 
-    #print("Requests node data: ",reqdat) 
     optimize_select = requests.get("http://192.168.50.247:9060/get_optimize_select").json()[email][project_name] #Getting the optimize select for the components and category of the components inside the list 
     try:
         robot_desc_req = requests.get("http://192.168.50.247:9060/get_robot_description").json()
